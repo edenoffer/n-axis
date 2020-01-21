@@ -17,18 +17,33 @@ const unsigned int outPort = 9999;      // remote port (not needed for receive)
 const unsigned int localPort = 8888;    // local port to listen for UDP packets (here's where we send the packets)
 OSCErrorCode error;
 
+
+//--- Pins of the sol valve----//
+int sol_L_1 = 1;
+int sol_L_2 = 2;
+int sol_R_3 = 3;
+int sol_R_4 = 4;
+
+
 void setup()
 {
-  //pinMode(BUILTIN_LED, OUTPUT);
-  ///digitalWrite(BUILTIN_LED, ledState);    // turn *on* led
+
   Serial.begin(115200);
-  // Connect to WiFi network
-  Serial.println();
-  Serial.println();
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
-  WiFi.begin(ssid, pass);
-  while (WiFi.status() != WL_CONNECTED)
+
+  //---setting pins as uptputs---/
+    pinMode(sol_L_1,OUTPUT);
+    pinMode(sol_L_2,OUTPUT);
+    pinMode(sol_R_3,OUTPUT);
+    pinMode(sol_R_4,OUTPUT);
+
+
+    // Connect to WiFi network
+    Serial.println();
+    Serial.println();
+    Serial.print("Connecting to ");
+    Serial.println(ssid);
+    WiFi.begin(ssid, pass);
+    while (WiFi.status() != WL_CONNECTED)
   {
     delay(500);
     Serial.print(".");
@@ -43,7 +58,7 @@ void setup()
 #ifdef ESP32
   Serial.println(localPort);
 #else
-  Serial.println(Udp.localPort());
+  //Serial.println(Udp.localPort());
 #endif
 }
 
@@ -55,25 +70,24 @@ void imuquat(OSCMessage &msg)
 
   if (sideAng > 90) {
     Serial.print("most left side, relay 1");
-    /*
-     * EDEN - write your code here for the most left relay, num 1 (when battry is up)
-     */
-  } else if (sideAng > 0 && sideAng <= 90) {
+    digitalWrite(sol_L_1, HIGH);
+  }
+
+  else if (sideAng > 0 && sideAng <= 90) {
     Serial.print("helf left side, relay 2");
-    /*
-     * EDEN - write your code here for the second relay from the left, num 2 (when battry is up)
-     */
-  } else if (sideAng < 0 && sideAng >= -90) {
+    digitalWrite(sol_L_2, HIGH);
+  }
+
+  else if (sideAng < 0 && sideAng >= -90) {
     Serial.print("helf right side, relay 3");
-    /*
-     * EDEN - write your code here for the scond relay from the right, num 3 (when battry is up)
-     */
-  } else if (sideAng < -90) {
+    digitalWrite(sol_R_3, HIGH);
+  }
+
+  else if (sideAng < -90) {
     Serial.print("most right side, relay 4");
-    /*
-     * EDEN - write your code here for the most right relay, num 4 (when battry is up)
-     */
-  } else {
+    digitalWrite(sol_R_4, HIGH);
+  }
+  else {
     Serial.print("no side, doing nothing");
   }
 }
